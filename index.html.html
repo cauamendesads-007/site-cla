@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mundo Fofo do Gatinho Preto - Envie Amor!</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins & Fredoka -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1b2e 0%, #fd007a 50%, #583a6f 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #f3e8ff;
+        }
+        .font-kawaii {
+            font-family: 'Fredoka', cursive;
+        }
+
+        /* Floating background hearts animation */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0.4) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.1) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .floating-heart {
+            position: absolute;
+            animation: floatUp 6s linear infinite;
+            pointer-events: none;
+        }
+
+        /* Cat interactive animations */
+        @keyframes earTwitchLeft {
+            0%, 100% { transform: rotate(0deg); }
+            45% { transform: rotate(0deg); }
+            50% { transform: rotate(-10deg); }
+            55% { transform: rotate(0deg); }
+        }
+        @keyframes earTwitchRight {
+            0%, 100% { transform: rotate(0deg); }
+            70% { transform: rotate(0deg); }
+            75% { transform: rotate(10deg); }
+            80% { transform: rotate(0deg); }
+        }
+        .cat-ear-left {
+            transform-origin: bottom right;
+            animation: earTwitchLeft 5s ease-in-out infinite;
+        }
+        .cat-ear-right {
+            transform-origin: bottom left;
+            animation: earTwitchRight 6s ease-in-out infinite;
+        }
+
+        @keyframes tailWag {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(18deg); }
+        }
+        .cat-tail {
+            transform-origin: 100px 320px;
+            animation: tailWag 3.5s ease-in-out infinite;
+        }
+
+        /* Eye blink & shine animation */
+        @keyframes eyeBlink {
+            0%, 94%, 98%, 100% { transform: scaleY(1); }
+            96% { transform: scaleY(0.1); }
+        }
+        .cat-eye {
+            transform-origin: center;
+            animation: eyeBlink 4s ease-in-out infinite;
+        }
+
+        /* Heart shooting out from cat */
+        @keyframes heartShootOut {
+            0% {
+                transform: translate(-50%, -50%) scale(0.2);
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(var(--s));
+                opacity: 0;
+            }
+        }
+        .heart-burst {
+            position: absolute;
+            pointer-events: none;
+            animation: heartShootOut 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Glow effects */
+        .emerald-glow {
+            filter: drop-shadow(0 0 10px #10b981) drop-shadow(0 0 20px #34d399);
+        }
+        .pink-glow {
+            filter: drop-shadow(0 0 15px #f43f5e) drop-shadow(0 0 25px #fb7185);
+        }
+        .bg-glass {
+            background: rgba(45, 30, 68, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(236, 72, 153, 0.25);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen relative selection:bg-pink-500 selection:text-white overflow-x-hidden">
+
+    <!-- Background Animated Floating Hearts -->
+    <div id="bg-hearts" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- Header -->
+    <header class="relative z-10 w-full py-6 px-8 flex justify-between items-center max-w-6xl mx-auto">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-pink-500/20 backdrop-blur-md rounded-2xl border border-pink-400/40 shadow-lg flex items-center justify-center text-emerald-400 text-2xl font-kawaii">
+                🐾
+            </div>
+            <span class="font-kawaii text-2xl text-pink-300 font-bold tracking-wide drop-shadow-md">Clarice</span>
+        </div>
+        <button onclick="toggleAudio()" class="bg-glass hover:bg-pink-900/40 text-pink-200 px-5 py-2.5 rounded-full shadow-md transition-all duration-300 font-medium text-sm flex items-center gap-2 hover:scale-105 active:scale-95">
+            <i class="fa-solid fa-volume-high text-pink-400" id="audio-icon"></i> 
+            <span id="sound-status">Efeitos: On</span>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-6 max-w-4xl mx-auto w-full">
+        
+        <!-- Speech Bubble -->
+        <div class="mb-6 transition-all duration-300 transform">
+            <div id="speech-bubble" class="bg-glass px-8 py-4 rounded-3xl shadow-2xl text-center relative max-w-md mx-auto">
+                <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-[#2d1e44]"></div>
+                <p id="cat-message" class="font-kawaii text-lg sm:text-xl text-pink-100 tracking-wide">"Sabia que o meu lugar preferido no mundo é bem pertinho de ti? Miauu! 🐾❤️!💚"</p>
+            </div>
+        </div>
+
+        <!-- Interactive Cat Container -->
+        <div id="cat-container" class="relative cursor-pointer group mb-8 select-none" onclick="triggerCatLove(event)" title="Clique no gatinho!">
+            <!-- Glowing aura behind cat -->
+            <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-pink-500/20 rounded-full filter blur-3xl transform scale-100 group-hover:scale-110 transition-all duration-500"></div>
+            
+            <!-- SVG Black Cat with White Patches and Green Eyes -->
+            <div class="relative w-72 h-72 sm:w-88 sm:h-88 drop-shadow-2xl transition-transform duration-300 group-hover:scale-105">
+                <svg viewBox="0 0 400 400" class="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">
+                    
+                    <!-- Tail (Black with White Tip) -->
+                    <g class="cat-tail">
+                        <path d="M 110 320 C 50 290 30 190 75 150" fill="none" stroke="#18181b" stroke-width="20" stroke-linecap="round"/>
+                        <!-- White Tail Tip -->
+                        <path d="M 75 150 C 70 145 65 155 78 165" fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+                    </g>
+
+                    <!-- Body (Black Fur) -->
+                    <ellipse cx="200" cy="255" rx="90" ry="85" fill="#18181b" />
+
+                    <!-- Chest Patch (White Fur Patch) -->
+                    <path d="M 170 200 C 180 260 220 260 230 200 C 220 280 180 280 170 200 Z" fill="#ffffff" opacity="0.95"/>
+                    <ellipse cx="200" cy="235" rx="35" ry="30" fill="#ffffff" />
+
+                    <!-- Paws Bottom (Black with White Toes/Socks) -->
+                    <!-- Left Paw -->
+                    <ellipse cx="155" cy="325" rx="22" ry="18" fill="#18181b" />
+                    <ellipse cx="155" cy="328" rx="18" ry="12" fill="#ffffff" /> <!-- White sock -->
+                    
+                    <!-- Right Paw -->
+                    <ellipse cx="245" cy="325" rx="22" ry="18" fill="#18181b" />
+                    <ellipse cx="245" cy="328" rx="18" ry="12" fill="#ffffff" /> <!-- White sock -->
+
+                    <!-- Head (Black Fur) -->
+                    <circle cx="200" cy="165" r="85" fill="#18181b" />
+
+                    <!-- Left Ear (Black + Pink Inner) -->
+                    <g class="cat-ear-left">
+                        <polygon points="120,110 135,25 180,95" fill="#18181b" />
+                        <polygon points="132,100 142,42 170,90" fill="#f472b6" opacity="0.7" />
+                        <!-- White ear tuft -->
+                        <path d="M 130 95 Q 140 85 145 98" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+                    </g>
+
+                    <!-- Right Ear (Black + Pink Inner) -->
+                    <g class="cat-ear-right">
+                        <polygon points="280,110 265,25 220,95" fill="#18181b" />
+                        <polygon points="268,100 258,42 230,90" fill="#f472b6" opacity="0.7" />
+                        <!-- White ear tuft -->
+                        <path d="M 270 95 Q 260 85 255 98" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+                    </g>
+
+                    <!-- White Muzzle Patch (White Patch around nose/mouth) -->
+                    <ellipse cx="200" cy="182" rx="32" ry="22" fill="#ffffff" />
+
+                    <!-- Cheeks (Soft Pink Blush) -->
+                    <ellipse cx="140" cy="178" rx="13" ry="8" fill="#fb7185" opacity="0.4" />
+                    <ellipse cx="260" cy="178" rx="13" ry="8" fill="#fb7185" opacity="0.4" />
+
+                    <!-- Emerald Green Eyes -->
+                    <g class="cat-eye">
+                        <!-- Left Eye -->
+                        <ellipse cx="155" cy="155" rx="18" ry="22" fill="#10b981" class="emerald-glow"/>
+                        <ellipse cx="155" cy="155" rx="7" ry="18" fill="#064e3b" /> <!-- Slit pupil -->
+                        <!-- Catchlight reflections -->
+                        <circle cx="150" cy="145" r="6" fill="#ffffff" />
+                        <circle cx="160" cy="162" r="3" fill="#ffffff" />
+
+                        <!-- Right Eye -->
+                        <ellipse cx="245" cy="155" rx="18" ry="22" fill="#10b981" class="emerald-glow"/>
+                        <ellipse cx="245" cy="155" rx="7" ry="18" fill="#064e3b" /> <!-- Slit pupil -->
+                        <!-- Catchlight reflections -->
+                        <circle cx="240" cy="145" r="6" fill="#ffffff" />
+                        <circle cx="250" cy="162" r="3" fill="#ffffff" />
+                    </g>
+
+                    <!-- Nose & Mouth -->
+                    <polygon points="195,174 205,174 200,180" fill="#fb7185" />
+                    <path d="M 200 180 Q 192 188 186 182" fill="none" stroke="#334155" stroke-width="3" stroke-linecap="round" />
+                    <path d="M 200 180 Q 208 188 214 182" fill="none" stroke="#334155" stroke-width="3" stroke-linecap="round" />
+
+                    <!-- White Whiskers (Highly Visible on Black Fur) -->
+                    <line x1="110" y1="170" x2="150" y2="178" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+                    <line x1="105" y1="185" x2="148" y2="186" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+                    <line x1="290" y1="170" x2="250" y2="178" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+                    <line x1="295" y1="185" x2="252" y2="186" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+
+                    <!-- Front Paws Holding a Heart (Black Paws with White Tips) -->
+                    <g id="cat-paws-front">
+                        <ellipse cx="170" cy="235" rx="16" ry="13" fill="#18181b" transform="rotate(-20 170 235)"/>
+                        <ellipse cx="168" cy="237" rx="12" ry="9" fill="#ffffff" transform="rotate(-20 168 237)"/>
+
+                        <ellipse cx="230" cy="235" rx="16" ry="13" fill="#18181b" transform="rotate(20 230 235)"/>
+                        <ellipse cx="228" cy="237" rx="12" ry="9" fill="#ffffff" transform="rotate(20 228 237)"/>
+                    </g>
+                </svg>
+            </div>
+            
+            <!-- Floating Heart Icon above Cat -->
+            <div class="absolute -top-2 right-8 bg-pink-500 text-white p-3.5 rounded-full shadow-lg border-2 border-pink-300 animate-bounce pink-glow">
+                <i class="fa-solid fa-heart text-2xl"></i>
+            </div>
+        </div>
+
+        <!-- Interactive Control Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-4 w-full max-w-md z-20">
+            <button onclick="triggerCatLove(event)" class="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-kawaii text-lg py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-pink-500/40 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2 border border-pink-300/30">
+                <i class="fa-solid fa-heart text-emerald-300"></i> Mandar Coração!
+            </button>
+            <button onclick="changeMessage()" class="bg-glass hover:bg-pink-900/40 text-pink-200 font-kawaii text-lg py-3.5 px-6 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-sparkles text-pink-400"></i> Nova Frase
+            </button>
+        </div>
+
+        <!-- Heart Counter Badge -->
+        <div class="mt-8 bg-glass px-6 py-2.5 rounded-full border border-pink-400/30 flex items-center gap-3 text-sm text-pink-200 shadow-md">
+            <span>Corações Enviados:</span>
+            <span id="love-counter" class="font-bold text-emerald-400 font-kawaii text-xl drop-shadow">0</span>
+            <span>💖</span>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-6 text-center text-xs text-pink-300/60 font-medium">
+        Feito para quem ama gatinhos pretos de olhos verdes 🐾 ✨
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const catQuotes = [
+            "Passando para te lembrar que és a pessoa mais especial do meu dia inteiro! ✨🐱",
+            "Tenho pelagem preta, mechas brancas e todo o amor do mundo pra você! 🐾💖",
+            "Sinta o meu carinho voando diretamente pro seu coração! 🥰",
+            "Você trouxe tanta luz pro meu mundinho escuro! 🌟",
+            "Ronronando bem forte enquanto mando esses corações pra você! 🎶",
+            "Gatinhos pretos dão muita sorte... e muito amor! 🍀💖"
+        ];
+
+        let loveCount = 0;
+        let soundEnabled = true;
+
+        // Initialize ambient floating hearts background
+        function initBgHearts() {
+            const container = document.getElementById('bg-hearts');
+            const heartCount = 20;
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                const isGreen = Math.random() > 0.7;
+                heart.innerHTML = `<i class="fa-solid fa-heart"></i>`;
+                heart.className = `floating-heart ${isGreen ? 'text-emerald-400 opacity-40' : 'text-pink-400 opacity-50'}`;
+                
+                const size = Math.random() * 22 + 10;
+                heart.style.fontSize = `${size}px`;
+                heart.style.left = `${Math.random() * 100}vw`;
+                heart.style.animationDuration = `${Math.random() * 6 + 4}s`;
+                heart.style.animationDelay = `${Math.random() * 5}s`;
+
+                container.appendChild(heart);
+            }
+        }
+
+        // Trigger Cat Heart Burst Animation
+        function triggerCatLove(event) {
+            loveCount++;
+            document.getElementById('love-counter').innerText = loveCount;
+
+            const catContainer = document.getElementById('cat-container');
+            const rect = catContainer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Spawn multiple flying hearts outward
+            const heartColors = ['#f43f5e', '#fb7185', '#10b981', '#34d399', '#ec4899'];
+            
+            for (let i = 0; i < 12; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '<i class="fa-solid fa-heart"></i>';
+                
+                const color = heartColors[Math.floor(Math.random() * heartColors.length)];
+                heart.style.color = color;
+                heart.className = 'heart-burst text-2xl z-50';
+
+                // Random trajectory directions
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 200 + 100;
+                const tx = `${Math.cos(angle) * distance}px`;
+                const ty = `${Math.sin(angle) * distance - 80}px`;
+                const scale = (Math.random() * 1.5 + 0.8).toFixed(2);
+
+                heart.style.setProperty('--tx', tx);
+                heart.style.setProperty('--ty', ty);
+                heart.style.setProperty('--s', scale);
+
+                heart.style.left = `${centerX}px`;
+                heart.style.top = `${centerY}px`;
+
+                document.body.appendChild(heart);
+
+                setTimeout(() => {
+                    heart.remove();
+                }, 1200);
+            }
+
+            // Play cute musical tone on love click
+            if (soundEnabled) {
+                playCuteSound();
+            }
+
+            // Animate speech bubble scale
+            const bubble = document.getElementById('speech-bubble');
+            bubble.classList.add('scale-105', 'border-pink-400');
+            setTimeout(() => {
+                bubble.classList.remove('scale-105', 'border-pink-400');
+            }, 250);
+        }
+
+        // Change cat speech text
+        function changeMessage() {
+            const messageEl = document.getElementById('cat-message');
+            let randomQuote;
+            do {
+                randomQuote = catQuotes[Math.floor(Math.random() * catQuotes.length)];
+            } while (randomQuote === messageEl.innerText);
+
+            messageEl.style.opacity = '0';
+            setTimeout(() => {
+                messageEl.innerText = `"${randomQuote}"`;
+                messageEl.style.opacity = '1';
+            }, 200);
+        }
+
+        // Web Audio API Synthesizer for cute chime sound
+        function playCuteSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Play two notes (harmonic arpeggio)
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+
+                    const startTime = audioCtx.currentTime + (idx * 0.06);
+                    gain.gain.setValueAtTime(0.12, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.25);
+                });
+            } catch (e) {
+                // Ignore audio context errors if browser restricts autoplay
+            }
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-status').innerText = soundEnabled ? "Efeitos: On" : "Efeitos: Off";
+            document.getElementById('audio-icon').className = soundEnabled ? "fa-solid fa-volume-high text-pink-400" : "fa-solid fa-volume-xmark text-slate-400";
+        }
+
+        window.onload = function() {
+            initBgHearts();
+        };
+    </script>
+</body>
+</html>
